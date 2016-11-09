@@ -4,13 +4,23 @@ module Shortly
   module Store
     @table=[]
 
+    @base=36
+
+    def self.encode i; i.to_s(@base); end
+    def self.decode s; s.to_i(@base); end
+
     def self.shorten url
-      @table << url
-      @table.length.to_s 32
+      exists = @table.find_index url
+      if exists
+        encode exists
+      else
+        @table << url
+        encode(@table.length)
+      end
     end
 
     def self.expand url
-      @table.at url.to_i(32)-1
+      @table.at decode(url)-1
     end
 
   end
