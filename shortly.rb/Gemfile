@@ -2,3 +2,7 @@ source :rubygems
 
 gem 'grape'
 gem 'sqlite3'
+
+group :development do
+  gem 'minitest'
+end
