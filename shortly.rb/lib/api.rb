@@ -18,7 +18,7 @@ module Shortly
         {
           long: params[:url],
           short: Shortly::Store::shorten(params[:url])
-        }.to_json
+        }
       end
 
       route_param :url do
@@ -26,12 +26,12 @@ module Shortly
         get do
           long = Shortly::Store::expand(params[:url])
           if long.nil?
-            status :no_content
+            status :not_found
           else
             {
               long: long,
               short: params[:url]
-            }.to_json
+            }
           end
         end
       end
