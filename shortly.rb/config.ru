@@ -1,26 +1,48 @@
+require 'sqlite3'
 require 'grape'
 
 module Shortly
   module Store
-    @table=[]
+    @db = SQLite3::Database.new "shortly.db"
+    @db.execute "CREATE TABLE IF NOT EXISTS urls
+      (id integer primary key,
+       url text)"
 
     @base=36
 
     def self.encode i; i.to_s(@base); end
     def self.decode s; s.to_i(@base); end
 
-    def self.shorten url
-      exists = @table.find_index url
+    def self.find_url id
+      res = @db.execute("select * from urls where id=?", id)
+      res[0][1] unless res.empty?
+    end
+
+    def self.find_id url
+      res = @db.execute("select * from urls where url=?", url)
+      res[0][0] unless res.empty?
+    end
+
+    def self.save url
+      @db.execute("insert into urls values (NULL, ?)", url)
+    end
+
+    def self.find_or_create url
+      exists = find_id url
       if exists
-        encode exists
+        exists
       else
-        @table << url
-        encode(@table.length-1)
+        save url
+        find_or_create url
       end
     end
 
-    def self.expand url
-      @table.at decode(url)
+    def self.shorten url
+      encode find_or_create(url)
+    end
+
+    def self.expand id
+      find_url decode(id)
     end
 
   end
