@@ -15,12 +15,12 @@ module Shortly
         encode exists
       else
         @table << url
-        encode(@table.length)
+        encode(@table.length-1)
       end
     end
 
     def self.expand url
-      @table.at decode(url)-1
+      @table.at decode(url)
     end
 
   end
@@ -47,7 +47,7 @@ module Shortly
         desc 'Expand a url'
         get do
           long = Shortly::Store::expand(params[:url])
-          if short.nil?
+          if long.nil?
             status :no_content
           else
             {
